@@ -13,7 +13,7 @@ namespace DragonsDen
 
         static void Main(string[] args)
         {
-            using (var repo = new Repository("c:/users/jporwol/documents/projects/DragonsDen"))
+            using (var repo = new Repository(args[0]))
             {
                 foreach (var log in repo.Commits.QueryBy(new CommitFilter() { SortBy = CommitSortStrategies.Time }))
                 {
