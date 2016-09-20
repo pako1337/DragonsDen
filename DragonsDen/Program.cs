@@ -36,10 +36,11 @@ namespace DragonsDen
                 }
             }
 
-            filesFrequency.Select(f => new { Frequency = f.Key, File = f.Value })
-                          .OrderBy(f => f.Frequency)
-                          .ToList()
-                          .ForEach(f => Console.WriteLine($"{f.File}\t{f.Frequency}"));
+            foreach (var f in filesFrequency.Select(f => new { Frequency = f.Value, File = f.Key })
+                                            .OrderByDescending(f => f.Frequency))
+            {
+                Console.WriteLine($"{f.Frequency}\t{f.File}");
+            }
 
             Console.ReadKey();
         }
