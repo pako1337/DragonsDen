@@ -15,12 +15,23 @@ namespace DragonsDen
         {
             using (var repo = new Repository("c:/users/jporwol/documents/projects/DragonsDen"))
             {
-                foreach (var log in repo.Commits)
+                foreach (var log in repo.Commits.QueryBy(new CommitFilter() { SortBy = CommitSortStrategies.Time }))
                 {
-                    Console.WriteLine(log.Id);
-                    foreach (var file in log.Tree)
+                    if (log.Parents.Any())
                     {
-                        UpdateFileFrequency(file);
+                        var oldTree = log.Parents.First().Tree;
+                        var changes = repo.Diff.Compare<TreeChanges>(oldTree, log.Tree);
+                        foreach (var change in changes)
+                        {
+                            UpdateFileFrequency(change.Path);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var file in log.Tree)
+                        {
+                            TreeEntryParsing(file);
+                        }
                     }
                 }
             }
@@ -33,20 +44,25 @@ namespace DragonsDen
             Console.ReadKey();
         }
 
-        private static void UpdateFileFrequency(TreeEntry file)
+        private static void TreeEntryParsing(TreeEntry file)
         {
             if (file.Mode == Mode.Directory)
             {
                 foreach (var child in (file.Target as Tree))
                 {
-                    UpdateFileFrequency(child);
+                    TreeEntryParsing(child);
                 }
             }
+            else
+                UpdateFileFrequency(file.Path);
+        }
 
+        private static void UpdateFileFrequency(string file)
+        {
             int frequency = 0;
-            filesFrequency.TryGetValue(file.Path, out frequency);
+            filesFrequency.TryGetValue(file, out frequency);
             frequency++;
-            filesFrequency[file.Path] = frequency;
+            filesFrequency[file] = frequency;
         }
     }
 }
