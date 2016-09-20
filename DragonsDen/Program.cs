@@ -20,10 +20,7 @@ namespace DragonsDen
                     Console.WriteLine(log.Id);
                     foreach (var file in log.Tree)
                     {
-                        int frequency = 0;
-                        filesFrequency.TryGetValue(file.Path, out frequency);
-                        frequency++;
-                        filesFrequency[file.Path] = frequency;
+                        UpdateFileFrequency(file);
                     }
                 }
             }
@@ -34,6 +31,22 @@ namespace DragonsDen
                           .ForEach(f => Console.WriteLine($"{f.File}\t{f.Frequency}"));
 
             Console.ReadKey();
+        }
+
+        private static void UpdateFileFrequency(TreeEntry file)
+        {
+            if (file.Mode == Mode.Directory)
+            {
+                foreach (var child in (file.Target as Tree))
+                {
+                    UpdateFileFrequency(child);
+                }
+            }
+
+            int frequency = 0;
+            filesFrequency.TryGetValue(file.Path, out frequency);
+            frequency++;
+            filesFrequency[file.Path] = frequency;
         }
     }
 }
