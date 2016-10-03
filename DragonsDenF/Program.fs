@@ -3,15 +3,19 @@
 open LibGit2Sharp
 open System
 
+let rec getFileNamesFromTree (treeEntry:TreeEntry) =
+    match treeEntry.Mode with
+        | Mode.Directory ->
+            treeEntry.Target :?> Tree
+            |> Seq.collect getFileNamesFromTree
+        | _ ->  seq { yield treeEntry.Path }
+
 let getRepoFiles (log:Commit) =
     log.Tree
-    |> Seq.collect (fun treeEntry ->
-                        match treeEntry.Mode with
-                        | Mode.Directory -> seq { yield "asdf" }
-                        | _ ->  seq { yield treeEntry.Path })
+    |> Seq.collect getFileNamesFromTree
 
 let getCommitChangedFiles (log:Commit) =
-    seq { yield "Parent" }
+    seq { yield " " }
 
 let getChangedFiles (log:Commit) =
     match not (Seq.isEmpty log.Parents) with
