@@ -5,10 +5,10 @@ open System
 
 let getRepoFiles (log:Commit) =
     log.Tree
-    |> Seq.map (fun treeEntry ->
-                    match treeEntry.Mode with
-                    | Mode.Directory -> "asdf"
-                    | _ -> "qwe")
+    |> Seq.collect (fun treeEntry ->
+                        match treeEntry.Mode with
+                        | Mode.Directory -> seq { yield "asdf" }
+                        | _ ->  seq { yield treeEntry.Path })
 
 let getCommitChangedFiles (log:Commit) =
     seq { yield "Parent" }
