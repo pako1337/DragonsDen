@@ -28,9 +28,8 @@ let main argv =
     use repo = new Repository(argv.[0])
     let filter = new CommitFilter()
     filter.SortBy <- CommitSortStrategies.Time
-    let logs = repo.Commits.QueryBy filter
-    logs
-    |> Seq.collect  getChangedFiles
+    repo.Commits.QueryBy filter
+    |> Seq.collect getChangedFiles
     |> Seq.iter (fun x -> printf "%s " x)
 
     System.Console.ReadKey() |> ignore
