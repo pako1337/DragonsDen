@@ -3,6 +3,17 @@
 open LibGit2Sharp
 open System
 
+let getRepoFiles (log:Commit) =
+    "No parent at all"
+
+let getCommitChangedFiles (log:Commit) =
+    "Parent!"
+
+let getChangedFiles (log:Commit) =
+    match not (Seq.isEmpty log.Parents) with
+    | true -> getCommitChangedFiles log
+    | false -> getRepoFiles log
+
 [<EntryPoint>]
 let main argv = 
     printfn "%A" argv
@@ -11,11 +22,7 @@ let main argv =
     filter.SortBy <- CommitSortStrategies.Time
     let logs = repo.Commits.QueryBy filter
     logs
-    |> Seq.map  (fun log ->
-        match not (Seq.isEmpty log.Parents) with
-        | true -> "Parent!"
-        | false -> "No parent at all"
-    )
+    |> Seq.map  getChangedFiles
     |> Seq.iter (fun x -> printf "%s " x)
 
 //         match log with
