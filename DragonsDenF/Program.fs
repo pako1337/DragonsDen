@@ -14,12 +14,14 @@ let getRepoFiles (log:Commit) =
     log.Tree
     |> Seq.collect getFileNamesFromTree
 
-let getCommitChangedFiles (log:Commit) =
-    seq { yield " " }
+let getCommitChangedFiles (repo:Repository) (log:Commit) =
+    let oldTree = log.Parents |> Seq.find(fun x -> true)
+    repo.Diff.Compare<TreeChanges>(oldTree.Tree, log.Tree)
+    |> Seq.map(fun x -> x.Path)
 
-let getChangedFiles (log:Commit) =
+let getChangedFiles (repo:Repository) (log:Commit) =
     match not (Seq.isEmpty log.Parents) with
-    | true -> getCommitChangedFiles log
+    | true -> getCommitChangedFiles repo log
     | false -> getRepoFiles log
 
 [<EntryPoint>]
@@ -27,6 +29,7 @@ let main argv =
     printfn "%A" argv
     use repo = new Repository(argv.[0])
     let filter = new CommitFilter()
+    let getChangedFilesForRepo = getChangedFiles repo
     filter.SortBy <- CommitSortStrategies.Time
     repo.Commits.QueryBy filter
     |> Seq.collect getChangedFiles
