@@ -32,8 +32,10 @@ let main argv =
     let getChangedFilesForRepo = getChangedFiles repo
     filter.SortBy <- CommitSortStrategies.Time
     repo.Commits.QueryBy filter
-    |> Seq.collect getChangedFiles
-    |> Seq.iter (fun x -> printf "%s " x)
+    |> Seq.collect getChangedFilesForRepo
+    |> Seq.countBy id
+    |> Seq.sortBy (fun (x,y) -> y)
+    |> Seq.iter (fun (x,y) -> printf "%s %i\n" x y)
 
     System.Console.ReadKey() |> ignore
 
