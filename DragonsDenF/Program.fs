@@ -1,6 +1,4 @@
-﻿// Learn more about F# at http://fsharp.org
-// See the 'F# Tutorial' project for more help.
-open LibGit2Sharp
+﻿open LibGit2Sharp
 open System
 
 let rec getFileNamesFromTree (treeEntry:TreeEntry) =
